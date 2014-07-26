@@ -1,0 +1,4 @@
+appserv
+*.o
+*.so
+a.out
