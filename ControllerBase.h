@@ -16,13 +16,13 @@
 
 using namespace std;
 
-class ControllerBase{
+class Controller{
 
   typedef function< void (const Request &) > ResponseFunction;
   typedef unique_ptr<ModelBase> PtrModel;
 
   private:
-    static map<string, ControllerBase*> s_ctrltbl;
+    static map<string, Controller*> s_ctrltbl;
     static vector<void *> s_libs;
     PtrModel m_pmodel;
     bool m_debugMode;
@@ -30,7 +30,7 @@ class ControllerBase{
   protected:
     map<string, ResponseFunction> responseTbl;
 
-    ControllerBase(string ctrlname)
+    Controller(string ctrlname)
     {
       auto pos = s_ctrltbl.find(ctrlname);
       if(pos == s_ctrltbl.end())
@@ -94,7 +94,24 @@ class ControllerBase{
 
     static void InvokeResponse(Request &request, string ctrlname, string action)
     {
-      s_ctrltbl[ctrlname]->InvokeResponse(action, request);
+      // TODO: Should be concurrency here.
+      unique_ptr<Controller> pc(s_ctrltbl[ctrlname]->CreateNew());
+      pc->InvokeResponse(action, request);
+    }
+
+    virtual Controller* CreateNew() = 0;
+};
+
+template <class T>
+class ControllerBase : public Controller
+{
+  public:
+
+    ControllerBase(string ctrlname) : Controller(ctrlname) { }
+
+    virtual Controller * CreateNew()
+    {
+      return new T;
     }
 };
 

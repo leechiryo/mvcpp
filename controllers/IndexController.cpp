@@ -2,7 +2,7 @@
 #include "../models/Index.h"
 #include "../models/DebugInfo.h"
 
-class IndexController : public ControllerBase
+class IndexController : public ControllerBase<IndexController>
 {
   public:
   IndexController() : ControllerBase("index")

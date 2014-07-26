@@ -1,7 +1,7 @@
 #include "../ControllerBase.h"
 #include "../models/DebugInfo.h"
 
-class TestController : public ControllerBase
+class TestController : public ControllerBase<TestController>
 {
   public:
   TestController() : ControllerBase("debug")

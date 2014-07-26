@@ -10,8 +10,8 @@
 
 using namespace std;
 
-map<string, ControllerBase*> ControllerBase::s_ctrltbl;
-vector<void *> ControllerBase::s_libs;
+map<string, Controller*> Controller::s_ctrltbl;
+vector<void *> Controller::s_libs;
 
 int main() {
 
@@ -29,9 +29,15 @@ int main() {
     Utility::GetUrlTagName(req.documentUri, soname, action);
 
     // load the library.
-    if(ControllerBase::LoadController(soname))
+    if(Controller::LoadController(soname))
     {
-      ControllerBase::InvokeResponse(req, soname, action);
+      Controller::InvokeResponse(req, soname, action);
+    }
+    else
+    {
+      // failed to load a library.
+      req.GetOutput() << "Content-type: text/html\r\n\r\n";
+      req.GetOutput() << "Can't initialize the controller: " << soname << endl;
     }
   }
 

@@ -9,11 +9,11 @@
 
 using namespace std;
 
-class ControllerBase;
+class Controller;
 
 class Request
 {
-  friend class ControllerBase;
+  friend class Controller;
   private:
     fcgi_streambuf m_cout_fcgi_streambuf;
     ostream m_os;
@@ -67,6 +67,8 @@ class Request
            remoteAddr, remotePort, serverAddr, serverPort, 
            serverName, postContents;
 
+    
+
     Request(const FCGX_Request &request): m_cout_fcgi_streambuf(request.out), m_os(&m_cout_fcgi_streambuf), nullstr("") { 
 
       // get raw params from environment viables
@@ -116,6 +118,11 @@ class Request
     {
       try{ return m_params.at(paramName); }
       catch(...) { return nullstr; }
+    }
+
+    ostream& GetOutput()
+    {
+      return m_os;
     }
 };
 
