@@ -1,0 +1,8 @@
+# connect to postgre server first time.
+psql -d postgres --username=pgsql
+
+# list the databases in the system.
+\list
+
+#list the tables in the current database.
+\dt
