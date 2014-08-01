@@ -16,6 +16,8 @@
 
 using namespace std;
 
+mutex mtx;
+mutex mtx2;
 class Controller{
 
   typedef function< void (const Request &) > ResponseFunction;
@@ -32,11 +34,21 @@ class Controller{
 
     Controller(string ctrlname)
     {
+      m_debugMode = false;
       auto pos = s_ctrltbl.find(ctrlname);
       if(pos == s_ctrltbl.end())
       {
-        // register myself to a global table.
-        s_ctrltbl.insert({ctrlname, this});
+        // Be careful for the concurency.
+        // Can not use the same mutex with the others.
+        lock_guard<mutex> lock(mtx2);
+
+        // Search the ctrl name again in the multi thread safe environment.
+        auto pos = s_ctrltbl.find(ctrlname);
+        if(pos == s_ctrltbl.end())
+        {
+          // register myself to a global table.
+          s_ctrltbl.insert({ctrlname, this});
+        }
       }
     }
 
@@ -49,8 +61,6 @@ class Controller{
     {
       m_debugMode = mode;
     }
-    
-  public:
 
     void InvokeResponse(const string &path, Request &request)
     {
@@ -73,6 +83,8 @@ class Controller{
         request.m_os << m << endl;
       }
     }
+    
+  public:
 
     static bool LoadController(string ctrlname)
     {
@@ -81,20 +93,31 @@ class Controller{
       {
         // not found in the controller table.
         // load from file.
-        void* dlib = dlopen(("modules/" + ctrlname + ".so").c_str(), RTLD_NOW);
-        if(dlib == NULL) 
+        
+        // Be careful for the concurency.
+        // Can not use the same mutex with the others.
+        lock_guard<mutex> lock(mtx);
+
+        // Search the ctrl name again in the multi thread safe environment.
+        auto pos = s_ctrltbl.find(ctrlname);
+        if(pos == s_ctrltbl.end())
         {
-          string errstr = dlerror();
-          return false; // load .so file failed. return false.
+
+          void* dlib = dlopen(("modules/" + ctrlname + ".so").c_str(), RTLD_NOW);
+          if(dlib == NULL) 
+          {
+            string errstr = dlerror();
+            return false; // load .so file failed. return false.
+          }
+
+          s_libs.push_back(dlib);
         }
-        s_libs.push_back(dlib);
       }
       return true;
     }
 
-    static void InvokeResponse(Request &request, string ctrlname, string action)
+    static void InvokeResponse(Request &request, const string& ctrlname, const string& action)
     {
-      // TODO: Should be concurrency here.
       unique_ptr<Controller> pc(s_ctrltbl[ctrlname]->CreateNew());
       pc->InvokeResponse(action, request);
     }

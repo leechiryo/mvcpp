@@ -1,12 +1,25 @@
 #include <iostream>
+#include <thread>
+#include <memory>
 
 #include "ViewBase.h"
 #include "ModelBase.h"
 
 using namespace std;
 
+mutex m;
+
+class SayHello{
+public:
+  void hello(const string& str) const
+  {
+    cout << "hello, welcome to the c++11 world. It is a very powerful language and has many amazing features." << endl << str << endl;
+  }
+};
+
 int main()
 {
+  /*
   ModelBase m1("view1");
   m1.SetShowData("name", "view1 name");
   m1.SetShowData("age", "view1 age");
@@ -39,4 +52,10 @@ int main()
   m1["sub_test2"].Add("sub_test2", m114);
 
   cout << m1;
+  */
+
+  unique_ptr<SayHello> px(new SayHello());
+  string str = "Have nothing to say about c++11.";
+  thread worker = thread(&SayHello::hello, move(px), std::ref(str));
+  worker.join();
 }

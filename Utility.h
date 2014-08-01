@@ -48,7 +48,7 @@ class Utility
    * find the segment following the /fcgi/
    * it will be used as share object name and the action name.
    */
-  static void GetUrlTagName(string requestUri, string& soname, string& action)
+  static void GetUrlTagName(const string& requestUri, string& soname, string& action)
   {
     auto startPos = requestUri.find("/fcgi/", 0);
 
