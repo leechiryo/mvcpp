@@ -3,7 +3,6 @@
 
 #include <map>
 #include <string>
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -20,17 +19,40 @@ mutex mtx;
 mutex mtx2;
 class Controller{
 
-  typedef function< void (const Request &) > ResponseFunction;
-  typedef unique_ptr<ModelBase> PtrModel;
-
   private:
+    typedef unique_ptr<ModelBase> PtrModel;
     static map<string, Controller*> s_ctrltbl;
     static vector<void *> s_libs;
-    PtrModel m_pmodel;
-    bool m_debugMode;
+
+    void InvokeResponse(const string &path, Request &request)
+    {
+      request.GetOutput() << "Content-type: text/html\r\n\r\n";
+      auto posFunc = responseTbl.find(path);
+      if(posFunc != responseTbl.end())
+      {
+        PtrResponseFunction responseFunc = posFunc->second;
+        (this->*responseFunc)(request);
+        if(m_pmodel) request.GetOutput() << *m_pmodel << endl;
+      }
+      else
+      {
+        request.GetOutput() << "Can't find the response for the path: " << path << endl;
+      }
+
+      if(m_debugMode)
+      {
+        DebugInfo m(request);
+        request.GetOutput() << m << endl;
+      }
+    }
 
   protected:
-    map<string, ResponseFunction> responseTbl;
+    // pointer to response function
+    typedef void (Controller::* PtrResponseFunction)(const Request&);
+    // response function table
+    map<string, PtrResponseFunction> responseTbl;
+    PtrModel m_pmodel;
+    bool m_debugMode;
 
     Controller(string ctrlname)
     {
@@ -39,7 +61,7 @@ class Controller{
       if(pos == s_ctrltbl.end())
       {
         // Be careful for the concurency.
-        // Can not use the same mutex with the others.
+        // Do not use the same mutex with the others.
         lock_guard<mutex> lock(mtx2);
 
         // Search the ctrl name again in the multi thread safe environment.
@@ -61,28 +83,6 @@ class Controller{
     {
       m_debugMode = mode;
     }
-
-    void InvokeResponse(const string &path, Request &request)
-    {
-      request.m_os << "Content-type: text/html\r\n\r\n";
-      auto posFunc = responseTbl.find(path);
-      if(posFunc != responseTbl.end())
-      {
-        ResponseFunction responseFunc = posFunc->second;
-        responseFunc(request);
-        if(m_pmodel) request.m_os << *m_pmodel << endl;
-      }
-      else
-      {
-        request.m_os << "Can't find the response for the path: " << path << endl;
-      }
-
-      if(m_debugMode)
-      {
-        DebugInfo m(request);
-        request.m_os << m << endl;
-      }
-    }
     
   public:
 
@@ -95,7 +95,7 @@ class Controller{
         // load from file.
         
         // Be careful for the concurency.
-        // Can not use the same mutex with the others.
+        // Do not use the same mutex with the others.
         lock_guard<mutex> lock(mtx);
 
         // Search the ctrl name again in the multi thread safe environment.
@@ -128,6 +128,7 @@ class Controller{
 template <class T>
 class ControllerBase : public Controller
 {
+
   public:
 
     ControllerBase(string ctrlname) : Controller(ctrlname) { }

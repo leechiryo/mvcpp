@@ -9,6 +9,7 @@ using namespace std;
 
 mutex m;
 
+
 class SayHello{
 public:
   void hello(const string& str) const
@@ -16,6 +17,8 @@ public:
     cout << "hello, welcome to the c++11 world. It is a very powerful language and has many amazing features." << endl << str << endl;
   }
 };
+
+typedef void (SayHello::* PtrHello)(const string& str) const;
 
 int main()
 {
@@ -55,7 +58,10 @@ int main()
   */
 
   unique_ptr<SayHello> px(new SayHello());
+  PtrHello pHello = &SayHello::hello;
   string str = "Have nothing to say about c++11.";
+  (px.get()->*pHello)(str);
+  
   thread worker = thread(&SayHello::hello, move(px), std::ref(str));
   worker.join();
 }

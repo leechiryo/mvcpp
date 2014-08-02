@@ -52,6 +52,7 @@ int main() {
 
     if (FCGX_Accept_r(request.get()) == 0)
     {
+      //ResponseRequest(move(request));
       thread response_thread(ResponseRequest, move(request));
       response_thread.detach();
     }

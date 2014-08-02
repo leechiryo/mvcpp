@@ -1,0 +1,2 @@
+#!/usr/local/bin/bash
+valgrind -v --leak-check=full --log-file=/tmp/vappserv.log ./appserv

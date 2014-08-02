@@ -9,16 +9,21 @@ class IndexController : public ControllerBase<IndexController>
   {
     SetDebugMode(true);
 
-    responseTbl["welcome"] = [&](const Request &request) {
-      ModelBase * pm = new Index();
-      Show(pm);
-    };
+    responseTbl["welcome"] = static_cast<PtrResponseFunction>(&IndexController::welcome);
+    responseTbl["hello"] = static_cast<PtrResponseFunction>(&IndexController::hello);
+  }
 
-    responseTbl["hello"] = [&](const Request &request) {
-      ModelBase * pm = new Index();
-      pm->SetShowData("hellomsg", "hello " + request.GetParam("tbxName"));
-      Show(pm);
-    };
+  void welcome(const Request &request)
+  {
+    ModelBase * pm = new Index();
+    Show(pm);
+  }
+
+  void hello(const Request &request)
+  {
+    ModelBase * pm = new Index();
+    pm->SetShowData("hellomsg", "hello " + request.GetParam("tbxName"));
+    Show(pm);
   }
 };
 
