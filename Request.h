@@ -9,11 +9,11 @@
 
 using namespace std;
 
-class Controller;
+class ControllerBase;
 
 class Request
 {
-  friend class Controller;
+  friend class ControllerBase;
   private:
     fcgi_streambuf m_cout_fcgi_streambuf;
     ostream m_os;

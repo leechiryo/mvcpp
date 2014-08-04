@@ -9,11 +9,12 @@
 
 #include "Request.h"
 #include "ControllerBase.h"
+#include "ControllerFactoryBase.h"
 
 using namespace std;
 
-map<string, Controller*> Controller::s_ctrltbl;
-vector<void *> Controller::s_libs;
+map<string, ControllerFactoryBase*> ControllerFactoryBase::s_ctrltbl;
+vector<void *> ControllerFactoryBase::s_libs;
 
 typedef unique_ptr<FCGX_Request> PtrFCGXRequest;
 
@@ -27,9 +28,9 @@ void ResponseRequest(PtrFCGXRequest request)
   Utility::GetUrlTagName(req.documentUri, soname, action);
 
   // load the library.
-  if(Controller::LoadController(soname))
+  if(ControllerFactoryBase::LoadController(soname))
   {
-    Controller::InvokeResponse(req, soname, action);
+    ControllerBase::InvokeResponse(req, soname, action);
   }
   else
   {

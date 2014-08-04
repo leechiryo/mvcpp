@@ -2,15 +2,12 @@
 #include "../models/Index.h"
 #include "../models/DebugInfo.h"
 
-class IndexController : public ControllerBase<IndexController>
+class IndexController : public ControllerBase
 {
   public:
   IndexController() : ControllerBase("index")
   {
     SetDebugMode(true);
-
-    responseTbl["welcome"] = static_cast<PtrResponseFunction>(&IndexController::welcome);
-    responseTbl["hello"] = static_cast<PtrResponseFunction>(&IndexController::hello);
   }
 
   void welcome(const Request &request)
@@ -26,5 +23,3 @@ class IndexController : public ControllerBase<IndexController>
     Show(pm);
   }
 };
-
-IndexController me;
