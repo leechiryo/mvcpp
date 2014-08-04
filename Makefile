@@ -7,7 +7,7 @@ build:
 	clang++ -c -std=c++11 controllers/DerivedControllerComplete.cpp
 	clang++ -shared -fPIC -Wl,-soname,debug.so -o modules/debug.so ControllerBase.o ControllerFactoryBase.o TestControllerComplete.o
 	clang++ -shared -fPIC -Wl,-soname,index.so -o modules/index.so ControllerBase.o ControllerFactoryBase.o IndexControllerComplete.o
-	clang++ -shared -fPIC -Wl,-soname,derived.so -o modules/derived.so ControllerBase.o ControllerFactoryBase.o TestControllerComplete.o DerivedControllerComplete.o
+	clang++ -shared -fPIC -Wl,-soname,derived.so -o modules/derived.so ControllerBase.o ControllerFactoryBase.o DerivedControllerComplete.o
 
 restart:
 	sudo pkill appserv
