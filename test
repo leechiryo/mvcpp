@@ -1,5 +1,0 @@
-#!/usr/local/bin/bash
-
-for i in {0..1000};
-  do curl http://localhost/fcgi/debug/info;
-done;
