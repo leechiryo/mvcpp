@@ -1,6 +1,7 @@
 #ifndef __MODEL_BASE_H__
 #define __MODEL_BASE_H__
 
+#include <vector>
 #include <map>
 #include <regex>
 #include <string>
@@ -14,25 +15,21 @@ class ModelBase
 {
   typedef unique_ptr<ViewBase> PtrView;
   typedef unique_ptr<ModelBase> PtrModel;
+  typedef vector<PtrModel> ModelPtrs;
+  typedef unique_ptr<ModelPtrs> PtrModelPtrs;
 
   friend ostream& operator<< ( ostream &os, ModelBase &m );
 
   protected:
   map<string, string> m_showData;
-  map<string, PtrModel> m_subModels;
+  map<string, PtrModelPtrs> m_subModels;
   PtrView m_pv;
 
   const string& GetView();
 
-  public:
   ModelBase(const char* viewname);
 
   ModelBase() : m_pv(nullptr) { }
-
-  void SetShowData(const string& key, const string& val)
-  {
-    m_showData[key] = val;
-  }
 
   string GetShowData(const string& key)
   {
@@ -43,14 +40,31 @@ class ModelBase
       return "";
   }
 
-  ModelBase& operator[](string key) 
+  ModelPtrs& operator[](string key) 
   {
     return *(m_subModels[key]);
   }
 
+  public:
+
+  void SetShowData(const string& key, const string& val)
+  {
+    m_showData[key] = val;
+  }
+
   void Add(string key, ModelBase* subModel)
   {
-    m_subModels[key] = PtrModel(subModel);
+    auto pos = m_subModels.find(key);
+    if(pos == m_subModels.end())
+    {
+      ModelPtrs* pmodelPtrs = new ModelPtrs;
+      pmodelPtrs->push_back(PtrModel(subModel));
+      m_subModels.insert(make_pair(key, PtrModelPtrs(pmodelPtrs)));
+    }
+    else
+    {
+      pos->second->push_back(PtrModel(subModel));
+    }
   }
 };
 

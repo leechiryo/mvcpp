@@ -3,9 +3,13 @@
 
 #include "ControllerBase.h"
 
+class ManageController;
+
 class ControllerFactoryBase
 {
   friend class ControllerBase;
+  friend class ManageController;
+
   static map<string, ControllerFactoryBase*> s_ctrltbl;
   static vector<void *> s_libs;
 

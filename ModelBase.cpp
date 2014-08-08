@@ -30,7 +30,9 @@ ostream& operator<< (ostream& os, ModelBase& t)
       }
       else if(pos2 != t.m_subModels.end())
       {
-        os << m.prefix().str() << *(t.m_subModels[m.str(1)]);
+        os << m.prefix().str();
+        for(auto &ptrsubmodel : *(t.m_subModels[m.str(1)]))
+          os << *ptrsubmodel;
       }
       else
       {
@@ -50,7 +52,15 @@ ostream& operator<< (ostream& os, ModelBase& t)
     }
     for(auto &sub : t.m_subModels)
     {
-      os << sub.first << ": " << *sub.second << ",";
+      os << sub.first << ": [";
+      
+      for(auto &ptrsubmodel : *sub.second)
+      {
+        ptrsubmodel->m_pv = nullptr;
+        os << *ptrsubmodel << ",";
+      }
+
+      os << "], ";
     }
     os << "}";
   }

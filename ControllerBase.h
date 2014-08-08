@@ -7,6 +7,9 @@
 #include <memory>
 #include <vector>
 #include <dlfcn.h>
+#include <signal.h>
+#include <thread>
+#include <setjmp.h>
 
 #include "Request.h"
 #include "ViewBase.h"
@@ -48,6 +51,7 @@ class ControllerBase
     
   public:
     static void InvokeResponse(Request &request, const string& ctrlname, const string& action);
+    static thread_local sigjmp_buf s_jbuf;
 };
 
 #endif

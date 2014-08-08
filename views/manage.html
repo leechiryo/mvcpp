@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link type="text/css" rel="stylesheet" href="/static/css/manage.css">
+  <title>MVC++管理</title>
+</head>
+<body>
+  <h1>MVC++ 管理</h1>
+  <hr>
+  <div>
+    <h2>モジュール一覧</h1>
+    <table>
+      <tr>
+        <th>モジュール名</th>
+        <th>ファイル名</th>
+        <th>ステータス</th>
+        <th></th>
+      </tr>
+      <% MODULES_INFO %>
+    </table>
+  </div>
+  <div>
+    <h2>ビュー一覧</h1>
+    <table>
+      <tr>
+        <th>ファイル名</th>
+        <th>ステータス</th>
+        <th></th>
+      </tr>
+      <% VIEWS_INFO %>
+    </table>
+  </div>
+</body>
+</html>
