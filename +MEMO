@@ -6,3 +6,9 @@ psql -d postgres --username=pgsql
 
 #list the tables in the current database.
 \dt
+
+#list the table definition
+\d tablename
+
+#make a component
+./makecomponent AngularTestController angular

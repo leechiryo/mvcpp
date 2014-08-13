@@ -1,8 +1,8 @@
 #include "DerivedController.h"
 #include "../ControllerFactoryBase.h"
 
-class DerivedControllerComplete : 
-  public DerivedController, 
+class DerivedControllerComplete :
+  public DerivedController,
   public ControllerFactory<DerivedControllerComplete>
 {
   public:

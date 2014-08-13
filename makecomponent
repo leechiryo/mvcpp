@@ -1,0 +1,10 @@
+#!/usr/local/bin/bash
+
+controller="$1"
+component="$2"
+
+tools/astparser/ctrlcpp controllers/${controller}.h -- -std=c++11 -x c++
+
+clang++ -c -std=c++11 controllers/${controller}Complete.cpp
+
+clang++ -shared -fPIC -Wl,-soname,${component}.so -o modules/${component}.so ControllerBase.o ControllerFactoryBase.o ${controller}Complete.o
