@@ -10,7 +10,14 @@ class AngularTestController : public ControllerBase
 
   void test(const Request &request)
   {
-    Show(new AngularTestModel());
+    if(request.GetUrlParams(0) != "")
+    {
+      Show(new AngularTestModel(request.GetUrlParams(0).c_str()));
+    }
+    else
+    {
+      Show(new AngularTestModel());
+    }
   }
 };
 

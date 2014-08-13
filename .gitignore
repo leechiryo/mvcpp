@@ -2,3 +2,4 @@ appserv
 *.o
 *.so
 a.out
+*.swp

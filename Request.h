@@ -1,10 +1,10 @@
-#ifndef __REQUEST_H__
-#define __REQUEST_H__
+#pragma once
 
 #include <iostream>
 #include <map>
+#include <vector>
+#include <sstream>
 
-#include "Utility.h"
 #include "/usr/local/include/fcgio.h"
 
 using namespace std;
@@ -14,10 +14,12 @@ class ControllerBase;
 class Request
 {
   friend class ControllerBase;
+
   private:
     fcgi_streambuf m_cout_fcgi_streambuf;
     ostream m_os;
     map<string, string> m_params;
+    vector<string> m_urlPartials;
     string nullstr;
 
     void SplitParams(const string data)
@@ -52,11 +54,71 @@ class Request
         // found the =!!
         // get the substring before = as param name and 
         // after = is the part of value.
-        string key( move ( Utility::HttpStrDecode ( str.substr(0, idx) ) ) );
+        string key( move ( HttpStrDecode ( str.substr(0, idx) ) ) );
         if ( m_params.find(key) == m_params.end() )
         {
-          m_params.insert(make_pair(key, Utility::HttpStrDecode(str.substr(idx+1))));
+          m_params.insert(make_pair(key, HttpStrDecode(str.substr(idx+1))));
         } 
+      }
+    }
+
+    /*
+     * Decode the http request string using utf8.
+     */
+    string HttpStrDecode(const string& data)
+    {
+      ostringstream os;
+      string::size_type pos = 0;
+
+      while(pos != data.length())
+      {
+        auto idx = data.find('%', pos);
+        if(idx != string::npos)
+        {
+          // found!!
+          os << data.substr(pos, idx-pos);
+          // push the following 2 char as char code into the string stream.
+          os << static_cast<char>(stoi(data.substr(idx+1, 2), nullptr, 16));
+          pos = idx + 3;
+        }
+        else
+        {
+          // no % in the last string.
+          os << data.substr(pos);
+          pos = data.length();
+        }
+      }
+
+      os << flush;
+
+      return os.str();
+    }
+
+    /*
+     * in the request uri like "/fcgi/soname/action/..."
+     * find the segment following the /fcgi/
+     * it will be used as share object name and the action name.
+     */
+    void GetUrlPartials(const string& requestUri)
+    {
+      m_urlPartials.clear();
+
+      auto startPos = requestUri.find("/fcgi/", 0);
+      if(startPos != string::npos)
+      {
+        startPos += 6;
+        auto endPos = requestUri.find('/', startPos);
+        while(endPos != string::npos)
+        {
+          m_urlPartials.push_back(requestUri.substr(startPos, endPos-startPos));
+          startPos = endPos + 1;
+          endPos = requestUri.find('/', startPos);
+        }
+
+        if (startPos != string::npos)
+        {
+          m_urlPartials.push_back(requestUri.substr(startPos, endPos-startPos));
+        }
       }
     }
 
@@ -67,10 +129,11 @@ class Request
            remoteAddr, remotePort, serverAddr, serverPort, 
            serverName, postContents;
 
-    
-
-    Request(const FCGX_Request &request): m_cout_fcgi_streambuf(request.out), m_os(&m_cout_fcgi_streambuf), nullstr("") { 
-
+    Request(const FCGX_Request &request)
+      : m_cout_fcgi_streambuf(request.out),
+        m_os(&m_cout_fcgi_streambuf),
+        nullstr("")
+    { 
       // get raw params from environment viables
       queryString = FCGX_GetParam("QUERY_STRING", request.envp);
       requestMethod = FCGX_GetParam("REQUEST_METHOD", request.envp);
@@ -104,7 +167,7 @@ class Request
         char *buf = new char[contLen+1];
         fin.read(buf, contLen);
         buf[contLen] = 0;
-        postContents = Utility::HttpStrDecode(buf);
+        postContents = HttpStrDecode(buf);
 
         // analyse the post contents(must be in the encoded status).
         SplitParams(buf);
@@ -112,6 +175,8 @@ class Request
         delete [] buf;
       }
 
+      // get url partials.
+      GetUrlPartials(documentUri);
     }
 
     const string& GetParam(const string& paramName) const
@@ -124,6 +189,34 @@ class Request
     {
       return m_os;
     }
-};
 
-#endif
+    const string& GetSoName() const
+    {
+      if(m_urlPartials.size() > 0)
+      {
+        return m_urlPartials[0];
+      }
+
+      return nullstr;
+    }
+
+    const string& GetAction() const
+    {
+      if(m_urlPartials.size() > 1)
+      {
+        return m_urlPartials[1];
+      }
+
+      return nullstr;
+    }
+
+    const string& GetUrlParams(int idx) const
+    {
+      if(m_urlPartials.size() > idx+2)
+      {
+        return m_urlPartials[idx+2];
+      }
+
+      return nullstr;
+    }
+};

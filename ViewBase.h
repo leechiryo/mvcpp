@@ -25,13 +25,25 @@ class ViewBase
     {
       string viewPath = "views/" + viewName + ".html";
       // read the view file into source
-      ifstream infile(viewPath);
-      infile.seekg(0, ios::end);
-      m_src.reserve(infile.tellg());
-      infile.seekg(0, ios::beg);
-      
-      m_src.assign(istreambuf_iterator<char>(infile), istreambuf_iterator<char>());
-      infile.close();
+      ifstream infile;
+      try
+      {
+        infile.open(viewPath);
+        infile.seekg(0, ios::end);
+        m_src.reserve(infile.tellg());
+        infile.seekg(0, ios::beg);
+        
+        m_src.assign(istreambuf_iterator<char>(infile), istreambuf_iterator<char>());
+        infile.close();
+      }
+      catch (...)
+      {
+        m_src = "The view file can't be loaded. " + viewName;
+        if(infile.is_open())
+        {
+          infile.close();
+        }
+      }
     }
 };
 

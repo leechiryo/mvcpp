@@ -23,21 +23,16 @@ void ResponseRequest(PtrFCGXRequest request)
 {
   Request req(*request);
 
-  // get .so library file name, and action name.
-  string soname;
-  string action;
-  Utility::GetUrlTagName(req.documentUri, soname, action);
-
   // load the library.
-  if(ControllerFactoryBase::LoadController(soname))
+  if(ControllerFactoryBase::LoadController(req.GetSoName()))
   {
-    ControllerBase::InvokeResponse(req, soname, action);
+    ControllerBase::InvokeResponse(req, req.GetSoName(), req.GetAction());
   }
   else
   {
     // failed to load a library.
     req.GetOutput() << "Content-type: text/html\r\n\r\n";
-    req.GetOutput() << "Can't initialize the controller: " << soname << endl;
+    req.GetOutput() << "Can't initialize the controller: " << req.GetSoName() << endl;
   }
 
   FCGX_Finish_r(request.get());
