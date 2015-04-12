@@ -12,3 +12,6 @@ psql -d postgres --username=pgsql
 
 #make a component
 ./makecomponent AngularTestController angular
+
+#access url
+http://192.168.1.5/fcgi/manage/list/
