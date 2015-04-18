@@ -1,20 +1,42 @@
+#### CREATE THE DATABASE
+# install postgresql 9.4
+pkg install postgres9.4-server
+
+# create new user (in bash)
+createuser --username=pgsql --interactive spiraluser
+
+# create new db (in bash)
+createdb --username=pgsql spiraldb
+
 # connect to postgre server first time.
 psql -d postgres --username=pgsql
 
-# set the password of ther pgsql
-\password pgsql
+# set the password of the user (in postgre)
+\password spiraluser
+(hint: the simple one)
 
-# list the databases in the system.
+# change owner to new user (in postgre).
+ALTER DATABASE spiraldb OWNER TO spiraluser;
+
+# quit the connection (in postgre)
+\q
+
+# connect to the sprialdb.
+psql -d spiraldb --username=spiraluser
+
+# list the databases in the system. (in postgre)
 \list
 
-#list the tables in the current database.
+#list the tables in the current database. (in postgre)
 \dt
 
-#list the table definition
+#list the table definition (in postgre)
 \d tablename
 
-#make a component
+#### Programming
+# make a component
 ./makecomponent AngularTestController angular
 
-#access url
+#### Test
+# access url
 http://192.168.1.5/fcgi/manage/list/
