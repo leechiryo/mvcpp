@@ -31,13 +31,17 @@ class ManageModel : public ModelBase
             strcpy(modulename, filename);
             modulename[strlen(filename)-3] = 0;
 
+            // Get file name in the modules folder which has expansion name of '.so'
+            // and search it in the control table.
             auto pos = ctrltbl.find(modulename);
             if(pos == ctrltbl.end())
             {
+              // If found, then the module is loaded.
               Add("MODULES_INFO", new ModuleInfoModel(modulename, filename, false));
             }
             else
             {
+              // Not found, then the module is not loaded.
               Add("MODULES_INFO", new ModuleInfoModel(modulename, filename, true));
             }
           }
