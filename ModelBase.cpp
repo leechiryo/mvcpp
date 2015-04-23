@@ -15,7 +15,7 @@ ostream& operator<< (ostream& os, ModelBase& t)
 {
   if(t.m_pv)
   {
-    regex reg("<%\\s*(.*?)\\s*%>");
+    regex reg("<%\\s*(.*?)\\s*%>"); /*Get the key name in the view html*/
     auto pos=t.GetView().cbegin();
     auto end=t.GetView().cend();
     smatch m;
@@ -26,10 +26,14 @@ ostream& operator<< (ostream& os, ModelBase& t)
       auto pos2 = t.m_subModels.find(m.str(1));
       if(t.GetShowData(m.str(1)) != "")
       {
+        // if the key is in the self model, then output the
+        // view string.
         os << m.prefix().str() << t.GetShowData(m.str(1));
       }
       else if(pos2 != t.m_subModels.end())
       {
+        // if the key is in the sub model, then output the
+        // sub model recursively.
         os << m.prefix().str();
         for(auto &ptrsubmodel : *(t.m_subModels[m.str(1)]))
           os << *ptrsubmodel;

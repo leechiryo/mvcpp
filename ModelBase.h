@@ -52,6 +52,12 @@ class ModelBase
     m_showData[key] = val;
   }
 
+  /*****
+   * If the key is already exist, then add the subModel into
+   * the array of the key.
+   * else create a new array for the key and add them into the
+   * map.
+   */
   void Add(string key, ModelBase* subModel)
   {
     auto pos = m_subModels.find(key);
