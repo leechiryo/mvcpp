@@ -1,0 +1,25 @@
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+.navbar-default {
+  background-color: #004680;
+  border-color: #0080c0;
+  background-image: none;
+}
+
+.navbar-default .navbar-brand{
+  color:#fff;
+}
+
+.navbar-default .navbar-brand:hover{
+  color:#dbdbdb;
+}
+
+.navbar-default .navbar-nav > li > a{
+  color:#fff;
+}
+.navbar-default .navbar-nav > li > a:hover{
+  color:#dbdbdb;
+}
