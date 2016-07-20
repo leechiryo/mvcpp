@@ -3,3 +3,7 @@ appserv
 *.so
 a.out
 *.swp
+*.jpg
+*.JPG
+*.mp3
+*.MP3
