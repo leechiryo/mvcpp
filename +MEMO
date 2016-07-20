@@ -39,4 +39,21 @@ psql -d spiraldb --username=spiraluser
 
 #### Test
 # access url
+# appservが死んだら、moduleを再コンパイルすれば治る
 http://192.168.1.5/fcgi/manage/list/
+http://192.168.1.5/fcgi/angular/test
+http://192.168.1.5/fcgi/angular/test/angular2
+
+#### Create ctags
+# Freebsd's default ctags is old.
+# Use exctags for the new ctags (exuberant ctags)
+exctags -R ./
+
+#### text to speech
+# 英語、中国語の方は、weblio
+curl "http://translate.weblio.jp/tts?query=fast.+f,+a,+s,+t,+fast.&ar=cc6d47ba8ef4d584&c=2&lp=ej&ext=mp3" > a.mp3
+curl "http://translate.weblio.jp/tts?query=He+pulled+too+hard+and+the+string+broke.&ar=cc6d47ba8ef4d584&c=2&lp=ej&ext=mp3" > a.mp3
+curl "http://translate.weblio.jp/tts-cn?query=%E4%BB%96%E6%8B%89%E5%BE%97%E5%A4%AA%E7%94%A8%E5%8A%9B%EF%BC%8C%E7%BB%B3%E5%AD%90%E6%96%AD%E4%BA%86%E3%80%82&ar=cc6d47ba8ef4d584&c=3&lp=cj&ext=mp3" > a.mp3
+
+# 英語以外一番品質が高いものはiSpeach
+curl "http://www.ispeech.org/p/generic/getaudio?text=彼があまり引っ張り過ぎて、ひもが切れた。&voice=jpjapanesefemale&speed=0&action=convert" > a.mp3

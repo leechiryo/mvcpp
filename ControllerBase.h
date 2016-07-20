@@ -23,6 +23,7 @@ class ControllerBase
   private:
     typedef unique_ptr<ModelBase> PtrModel;
     void InvokeResponse(const string &path, Request &request);
+    string m_responseMime;
 
   protected:
     // pointer to response function
@@ -33,10 +34,11 @@ class ControllerBase
     bool m_debugMode;
     string m_ctrlName;
 
-    ControllerBase(const string& ctrlname)
+    ControllerBase(const string& ctrlname, const char* responseMime="text/html")
     {
       m_debugMode = false;
       m_ctrlName = ctrlname;
+      m_responseMime = responseMime;
     }
 
     void Show(ModelBase *pm)

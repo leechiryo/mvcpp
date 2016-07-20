@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../ControllerBase.h"
 #include "../models/AngularTestModel.h"
 

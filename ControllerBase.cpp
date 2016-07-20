@@ -3,7 +3,11 @@
 
 void ControllerBase::InvokeResponse(const string &path, Request &request)
 {
-  request.GetOutput() << "Content-type: text/html\r\n\r\n";
+  // output the response header.
+  request.GetOutput() << "Content-type: ";
+  request.GetOutput() << m_responseMime;
+  request.GetOutput() << "\r\n\r\n";
+
   auto posFunc = responseTbl.find(path);
   if(posFunc != responseTbl.end())
   {
