@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>VUE test</title>
+    <script src="/static/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <p>{{message}}</p>
+      <input v-model="message" v-on:keyup.enter="addTodo">
+      <p v-if="greeting">Hello!</p>
+    </div>
+    <script src="vuetest.js"></script>
+  </body>
+</html>

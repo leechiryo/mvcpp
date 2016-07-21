@@ -43,6 +43,7 @@ psql -d spiraldb --username=spiraluser
 http://192.168.1.5/fcgi/manage/list/
 http://192.168.1.5/fcgi/angular/test
 http://192.168.1.5/fcgi/angular/test/angular2
+http://192.168.1.5/fcgi/pics/list?f=2015-06-21
 
 #### Create ctags
 # Freebsd's default ctags is old.
