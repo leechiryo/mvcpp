@@ -41,6 +41,9 @@ public:
         rewriter.setSourceMgr(astContext->getSourceManager(), astContext->getLangOpts());
     }
 
+    virtual ~ReadFuncVisitor(){
+    }
+
     virtual bool VisitCXXRecordDecl(CXXRecordDecl *record){
       string className = record->getNameAsString();
       if(className == "ControllerBase") controllerBase = record;
@@ -163,8 +166,8 @@ public:
 
 class ReadFuncFrontendAction : public ASTFrontendAction {
 public:
-    virtual ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef file) {
-        return new ReadFuncASTConsumer(&CI); // pass CI pointer to ASTConsumer
+    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI, StringRef file) {
+        return make_unique<ReadFuncASTConsumer>(&CI); // pass CI pointer to ASTConsumer
     }
 };
 
@@ -174,7 +177,8 @@ int main(int argc, const char **argv) {
 
 
     // parse the command-line args passed to your code
-    CommonOptionsParser op(argc, argv);        
+    cl::OptionCategory myCategory("ctrlcpp tool options");
+    CommonOptionsParser op(argc, argv, myCategory);        
 
     // create a new Clang Tool instance (a LibTooling environment)
     ClangTool Tool(op.getCompilations(), op.getSourcePathList());
@@ -184,7 +188,7 @@ int main(int argc, const char **argv) {
     srcpath = cwd;
 
     // run the Clang Tool, creating a new FrontendAction (explained below)
-    int result = Tool.run(newFrontendActionFactory<ReadFuncFrontendAction>());
+    int result = Tool.run(newFrontendActionFactory<ReadFuncFrontendAction>().get());
 
     // result = Tool.run(newFrontendActionFactory<RewriteFrontendAction>());
 /*

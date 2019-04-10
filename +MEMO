@@ -37,6 +37,12 @@ psql -d spiraldb --username=spiraluser
 # make a component
 ./makecomponent AngularTestController angular
 
+# componentをもう一度コンパイルしたら、make restartでサーバーを再起動
+make restart
+
+# ファイルに書き込む必要がある場合、ファイルのオーナーとグループを「www」に設定する必要がある
+sudo chown www:www %書き込み対象ファイル%
+
 #### Test
 # access url
 # appservが死んだら、moduleを再コンパイルすれば治る

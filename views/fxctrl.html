@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Policy Control</title>
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="/static/bootstrap/css/bootstrap-theme.css" rel="stylesheet" />
+    <link href="/static/site.css" rel="stylesheet" />
+    <style>
+form{
+  margin-left:2em;
+}
+
+.radio{
+  margin:2em 0em;
+}
+
+    </style>
+  </head>
+  <body>
+
+    <form action="/fcgi/fxctrl/set" method="post">
+      <div class="radio">
+        <label>
+          <input type="radio" name="policy" value="1">B GRID
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="policy" value="2">S GRID
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="policy" value="3">A GRID
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="policy" value="0">CLEAR
+        </label>
+      </div>
+      <input class="btn btn-primary" type="submit" name="btnSubmit" value="Submit">
+    </form>
+
+    <script>
+var po = <% policy %>;
+window.onload=function(){
+  var rbtn = document.querySelector("input[name='policy'][value='" + po + "']");
+  if(rbtn){
+    rbtn.checked = true;
+  }
+}
+    </script>
+
+  </body>
+</html>
