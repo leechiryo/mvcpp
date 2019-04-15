@@ -2,3 +2,4 @@
 
 # Request the target page using 4 threads, keep 200 connections in 30 seconds.
 wrk -t4 -c200 -d30s http://localhost/fcgi/debug/info
+# wrk -t4 -c200 -d30s http://localhost/index.html

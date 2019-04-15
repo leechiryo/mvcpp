@@ -21,6 +21,7 @@ class Request
     map<string, string> m_params;
     vector<string> m_urlPartials;
     string nullstr;
+    string m_boundary;
 
     void SplitParams(const string data)
     {
@@ -122,6 +123,95 @@ class Request
       }
     }
 
+    void ReadBoundary(const string& contentType){
+      auto pos = contentType.find("boundary=", 0);
+      if(pos != string::npos){
+        pos += 9;
+        m_boundary = "--";
+        m_boundary += contentType.substr(pos);
+      }
+    }
+
+    int searchInBuf(const char * buf, int startIdx, int endIdx, const char * key){
+      auto keyLen = strlen(key);
+      int searchIdx = 0;
+      for(int i = startIdx; i <= endIdx; i++){
+        if(buf[i] == key[searchIdx]){
+          searchIdx ++;
+          if(searchIdx >= keyLen){
+            return i;
+          }
+        } else{
+          searchIdx = 0;
+        }
+      }
+
+      return -1;
+    }
+
+    string Parse(char * multiContents, int startIdx, int endIdx, const char * key){
+      int keyLen = strlen(key);
+      if(keyLen > 97) return nullstr;
+
+      char skey[100];
+      strcpy(skey, key);
+      strcpy(skey + keyLen, "=\"");
+      keyLen += 2;
+      skey[keyLen] = 0;
+
+      int idx = searchInBuf(multiContents, startIdx, endIdx, skey);
+      if(idx == -1) return nullstr;
+
+      while (multiContents[idx - keyLen] != ' ' && multiContents[idx - keyLen] != ';'){
+        idx = searchInBuf(multiContents, idx + 1, endIdx, skey);
+        if(idx == -1) return nullstr;
+      }
+
+      int idx2 = searchInBuf(multiContents, idx + 1, endIdx, "\"");
+      if(idx2 == -1) return nullstr;
+
+      string retval(multiContents+idx+1, multiContents+idx2);
+      return retval;
+    }
+
+    void ParseParam(char * multiContents, int startIdx, int endIdx){
+      int idx = searchInBuf(multiContents, startIdx, endIdx, "\r\n\r\n");
+      if(idx >= 0){
+        string name = Parse(multiContents, startIdx, idx - 4, "name");
+        string filename = Parse(multiContents, startIdx, idx - 4, "filename");
+        if(name != nullstr){
+          if(filename == nullstr) {
+            // common input fields.
+            string key( move ( HttpStrDecode (name) ));
+            string val( multiContents + idx + 1, multiContents + endIdx);
+            if ( m_params.find(key) == m_params.end() )
+            {
+              m_params.insert(make_pair(key, HttpStrDecode(val)));
+            }
+          } else {
+            // uploaded file.
+          }
+          
+        }
+      }
+    }
+
+    void ParseParams(char * multiContents, int contLen){
+      auto boundaryLen = m_boundary.size();
+      int idx = 0;
+      int startIdx = 0;
+      int endIdx = 0;
+      while(1){
+        idx = searchInBuf(multiContents, idx, contLen-1, m_boundary.c_str());
+        if (idx == -1) break;
+        endIdx = idx - boundaryLen;
+        if(startIdx < endIdx) {
+          ParseParam(multiContents, startIdx, endIdx);
+        }
+        startIdx = idx + 1;
+      }
+    }
+
   public:
     string queryString, requestMethod, contentType, contentLength, 
            scriptName, requestUri, documentUri, documentRoot, 
@@ -132,7 +222,7 @@ class Request
     Request(const FCGX_Request &request)
       : m_cout_fcgi_streambuf(request.out),
         m_os(&m_cout_fcgi_streambuf),
-        nullstr("")
+        nullstr(""), m_boundary("")
     { 
       // get raw params from environment viables
       queryString = FCGX_GetParam("QUERY_STRING", request.envp);
@@ -170,7 +260,15 @@ class Request
         postContents = HttpStrDecode(buf);
 
         // analyse the post contents(must be in the encoded status).
-        SplitParams(buf);
+        if(contentType == "application/x-www-form-urlencoded"){
+          SplitParams(buf);
+        }
+        else if(contentType.compare(0, 20, "multipart/form-data;") == 0){
+          ReadBoundary(contentType);
+          if(m_boundary != ""){
+            ParseParams(buf, contLen);
+          }
+        }
 
         delete [] buf;
       }
