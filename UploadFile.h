@@ -13,23 +13,23 @@ public:
   UploadFile(string fileName, FILE * tmpfile){
     m_fileName = fileName;
     m_tmpfile = tmpfile;
-    if(tmpfile){
-      fseek(tmpfile, 0, SEEK_SET);
+    if (tmpfile) {
+      rewind(tmpfile);
     }
   }
 
   virtual ~UploadFile(){
-    if(m_tmpfile) {
+    if (m_tmpfile) {
       fclose(m_tmpfile);
       m_tmpfile = nullptr;
     }
   }
 
-  const string& getName(){
+  const string& getName() const {
     return m_fileName;
   }
 
-  FILE* getFile() {
+  FILE* getFile() const {
     return m_tmpfile;
   }
 };

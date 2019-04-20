@@ -22,11 +22,11 @@ private:
   fcgi_streambuf m_cout_fcgi_streambuf;
   ostream m_os;
   map<string, string> m_params;
-  //map<string, UploadFile> m_files;
   vector<string> m_urlPartials;
   string nullstr;
   string m_boundary;
   UploadFile m_emptyFile;
+  map<string, UploadFile> m_files;
 
   void SplitParams(const string data)
   {
@@ -211,11 +211,10 @@ private:
               fwrite(buf, 1, size, file);
             }
             fwrite(buf, 1, size, file);
-           /* if (m_files.find(key) == m_files.end()) {
+            if (m_files.find(key) == m_files.end()) {
               UploadFile up(filename, file);
               m_files.insert(make_pair(key, up));
-            } */
-            //fclose(file);
+            }
           }
         }
       }
@@ -255,7 +254,7 @@ public:
 
     // analyse the query string (must be in the encoded status).
     m_params.clear();
-    // m_files.clear();
+    m_files.clear();
     SplitParams(queryString);
 
     // read the post contents.
@@ -293,13 +292,11 @@ public:
     catch (...) { return nullstr; }
   }
 
-/*
   const UploadFile& GetFile(const string & paramName) const
   {
     try { return m_files.at(paramName); }
     catch (...) { return m_emptyFile; }
   }
-*/
 
   ostream& GetOutput()
   {

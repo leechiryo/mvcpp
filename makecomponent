@@ -3,8 +3,8 @@
 controller="$1"
 component="$2"
 
-tools/astparser/ctrlcpp controllers/${controller}.h -- -std=c++11 -x c++
+tools/astparser/ctrlcpp controllers/${controller}.h -- -std=c++11 -x c++ -I /usr/local/include
 
-clang++ -c -std=c++11 -fPIC controllers/${controller}Complete.cpp
+clang++ -c -std=c++11 -fPIC -I /usr/local/include controllers/${controller}Complete.cpp
 
 clang++ -shared -fPIC -Wl,-soname,${component}.so -o modules/${component}.so ControllerBase.o ControllerFactoryBase.o ${controller}Complete.o

@@ -1,8 +1,9 @@
 #include "IndexController.h"
 #include "../ControllerFactoryBase.h"
 
-class IndexControllerComplete : 
-  public IndexController, public ControllerFactory<IndexControllerComplete>
+class IndexControllerComplete :
+  public IndexController,
+  public ControllerFactory<IndexControllerComplete>
 {
   public:
   IndexControllerComplete():ControllerFactory(m_ctrlName)
