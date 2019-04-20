@@ -8,6 +8,7 @@
 #include <fcgio.h>
 
 #include "RequestStream.h"
+#include "UploadFile.h"
 
 using namespace std;
 
@@ -21,9 +22,11 @@ private:
   fcgi_streambuf m_cout_fcgi_streambuf;
   ostream m_os;
   map<string, string> m_params;
+  //map<string, UploadFile> m_files;
   vector<string> m_urlPartials;
   string nullstr;
   string m_boundary;
+  UploadFile m_emptyFile;
 
   void SplitParams(const string data)
   {
@@ -177,6 +180,9 @@ private:
     return retval;
   }
 
+  /*
+   * Parse param from multi-part form data.
+   */
   void ParseParams(istream & fin, int contLen) {
     RequestStream rs{ &fin,  &m_boundary, static_cast<size_t>(contLen) };
     rs.SeekToNextSection();
@@ -187,9 +193,9 @@ private:
       string name = Parse(header.c_str(), 0, header.size() - 1, "name");
       string filename = Parse(header.c_str(), 0, header.size() - 1, "filename");
       if (name != nullstr) {
+        string key(move(HttpStrDecode(name)));
         if (filename == nullstr) {
           // common input fields.
-          string key(move(HttpStrDecode(name)));
           string val;
           rs.ReadTextBody(val);
           if (m_params.find(key) == m_params.end()) {
@@ -198,6 +204,19 @@ private:
         }
         else {
           // uploaded file.
+          if (FILE * file = tmpfile()) {
+            char buf[2048];
+            size_t size = 0;
+            while(!rs.ReadFileBody(buf, 2048, size)){
+              fwrite(buf, 1, size, file);
+            }
+            fwrite(buf, 1, size, file);
+           /* if (m_files.find(key) == m_files.end()) {
+              UploadFile up(filename, file);
+              m_files.insert(make_pair(key, up));
+            } */
+            //fclose(file);
+          }
         }
       }
 
@@ -214,7 +233,7 @@ public:
   Request(const FCGX_Request & request)
     : m_cout_fcgi_streambuf(request.out),
     m_os(&m_cout_fcgi_streambuf),
-    nullstr(""), m_boundary("")
+    nullstr(""), m_boundary(""), m_emptyFile("", nullptr)
   {
     // get raw params from environment viables
     queryString = FCGX_GetParam("QUERY_STRING", request.envp);
@@ -236,6 +255,7 @@ public:
 
     // analyse the query string (must be in the encoded status).
     m_params.clear();
+    // m_files.clear();
     SplitParams(queryString);
 
     // read the post contents.
@@ -272,6 +292,14 @@ public:
     try { return m_params.at(paramName); }
     catch (...) { return nullstr; }
   }
+
+/*
+  const UploadFile& GetFile(const string & paramName) const
+  {
+    try { return m_files.at(paramName); }
+    catch (...) { return m_emptyFile; }
+  }
+*/
 
   ostream& GetOutput()
   {
