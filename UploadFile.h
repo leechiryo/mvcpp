@@ -18,6 +18,19 @@ public:
     }
   }
 
+  UploadFile(UploadFile&& rval) {
+    m_fileName = rval.m_fileName;
+    m_tmpfile = rval.m_tmpfile;
+    rval.m_tmpfile = nullptr;
+  }
+
+  UploadFile& operator= (UploadFile&& rval) {
+    m_fileName = rval.m_fileName;
+    m_tmpfile = rval.m_tmpfile;
+    rval.m_tmpfile = nullptr;
+    return *this;
+  }
+
   virtual ~UploadFile(){
     if (m_tmpfile) {
       fclose(m_tmpfile);

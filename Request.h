@@ -213,7 +213,7 @@ private:
             fwrite(buf, 1, size, file);
             if (m_files.find(key) == m_files.end()) {
               UploadFile up(filename, file);
-              m_files.insert(make_pair(key, up));
+              m_files.insert(make_pair(key, move(up)));
             }
           }
         }
