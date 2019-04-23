@@ -10,6 +10,7 @@ class RequestStream {
 private:
   istream* m_stream;
   const string* m_boundary;
+  string m_boundary2;
   size_t m_length;
   size_t m_readPtr;
   deque<char> escbuf;
@@ -18,6 +19,7 @@ public:
   RequestStream(istream* stream, const string* boundary, size_t length) {
     m_stream = stream;
     m_boundary = boundary;
+    m_boundary2 = "\r\n" + *m_boundary;
     m_readPtr = 0;
     m_length = length;
   }
@@ -120,7 +122,7 @@ public:
     size_t readBytes = 0;
     size_t size = 0;
 
-    while (!ReadUntil(buf, 2048, *m_boundary, size)) {
+    while (!ReadUntil(buf, 2048, m_boundary2, size)) {
       body.append(buf, size);
       readBytes += size;
     }
@@ -131,6 +133,6 @@ public:
   }
 
   bool ReadFileBody(char* buf, size_t bufSize, size_t& readSize) {
-    return ReadUntil(buf, bufSize, *m_boundary, readSize);
+    return ReadUntil(buf, bufSize, m_boundary2, readSize);
   }
 };
