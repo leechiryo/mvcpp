@@ -2,9 +2,10 @@
 
 controller="$1"
 component="$2"
+linkopt="${@:3}"
 
 tools/astparser/ctrlcpp controllers/${controller}.h -- -std=c++11 -x c++ -I /usr/local/include
 
-clang++ -c -std=c++11 -fPIC -I /usr/local/include controllers/${controller}Complete.cpp
+clang++ -c -std=c++11 -fPIC -I /usr/local/include controllers/${controller}Complete.cpp -g3 -O0
 
-clang++ -shared -fPIC -Wl,-soname,${component}.so -o modules/${component}.so ControllerBase.o ControllerFactoryBase.o ${controller}Complete.o
+clang++ -shared -fPIC -Wl,-soname,${component}.so -o modules/${component}.so ControllerBase.o ControllerFactoryBase.o ${controller}Complete.o ${linkopt}

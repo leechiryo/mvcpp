@@ -292,10 +292,10 @@ public:
     catch (...) { return nullstr; }
   }
 
-  const UploadFile& GetFile(const string & paramName) const
+  const UploadFile* GetFile(const string & paramName) const
   {
-    try { return m_files.at(paramName); }
-    catch (...) { return m_emptyFile; }
+    try { return &(m_files.at(paramName)); }
+    catch (...) { return &m_emptyFile; }
   }
 
   ostream& GetOutput()

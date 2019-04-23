@@ -1,5 +1,5 @@
 build:
-	clang++ ControllerBase.cpp ControllerFactoryBase.cpp ModelBase.cpp main.cpp -g3 -O0 -o appserv -rdynamic -std=c++11 -L /usr/local/lib -lfcgi++ -lfcgi -lpthread
+	clang++ ControllerBase.cpp ControllerFactoryBase.cpp ModelBase.cpp main.cpp -g3 -O0 -o appserv -rdynamic -std=c++11 -I/usr/local/include -L/usr/local/lib -lfcgi++ -lfcgi -lpthread
 	clang++ -c -std=c++11 -fPIC ControllerBase.cpp
 	clang++ -c -std=c++11 -fPIC ControllerFactoryBase.cpp
 	clang++ -c -std=c++11 -fPIC controllers/AngularTestControllerComplete.cpp

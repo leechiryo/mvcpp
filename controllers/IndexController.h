@@ -21,11 +21,10 @@ class IndexController : public ControllerBase
   {
     ModelBase * pm = new Index();
     auto upfile  = request.GetFile("file1");
-    string fileName = upfile.getName();
+    string fileName = upfile->getName();
     char str[256] = {0,};
-    FILE* tmp = upfile.getFile();
+    FILE* tmp = upfile->getFile();
     if (tmp) {
-      rewind(tmp);
       char* s = fgets(str, 256, tmp);
       if(!s){
         sprintf (str, "file read error. %s", strerror(errno));

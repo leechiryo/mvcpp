@@ -10,6 +10,7 @@ class PicsControllerComplete :
   {
     responseTbl["login"] = static_cast<PtrResponseFunction>(&PicsController::login);
     responseTbl["list"] = static_cast<PtrResponseFunction>(&PicsController::list);
+    responseTbl["upload"] = static_cast<PtrResponseFunction>(&PicsController::upload);
     responseTbl["detail"] = static_cast<PtrResponseFunction>(&PicsController::detail);
   }
 };

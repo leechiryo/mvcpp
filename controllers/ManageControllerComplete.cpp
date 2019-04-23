@@ -1,8 +1,8 @@
 #include "ManageController.h"
 #include "../ControllerFactoryBase.h"
 
-class ManageControllerComplete : 
-  public ManageController, 
+class ManageControllerComplete :
+  public ManageController,
   public ControllerFactory<ManageControllerComplete>
 {
   public:
