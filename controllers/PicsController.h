@@ -112,7 +112,7 @@ private:
     if (fileName.size() <= 4) return false;
 
     string ext = fileName.substr(fileName.size() - 4);
-    for(char c : ext){
+    for(char & c : ext){
       c = static_cast<char>(tolower(c));
     }
     return ext == ".jpg";

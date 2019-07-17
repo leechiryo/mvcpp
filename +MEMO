@@ -1,28 +1,28 @@
 #### CREATE THE DATABASE
-# install postgresql 9.4
-pkg install postgres9.4-server
+# install postgresql 11
+pkg install postgres11-server
 
 # create new user (in bash)
-createuser --username=pgsql --interactive spiraluser
+createuser --username=postgres --interactive irasenuser
 
 # create new db (in bash)
-createdb --username=pgsql spiraldb
+createdb --username=postgres irasendb
 
 # connect to postgre server first time.
-psql -d postgres --username=pgsql
+psql -d postgres --username=postgres
 
 # set the password of the user (in postgre)
-\password spiraluser
+\password irasenuser
 (hint: the simple one)
 
 # change owner to new user (in postgre).
-ALTER DATABASE spiraldb OWNER TO spiraluser;
+ALTER DATABASE irasendb OWNER TO irasenuser;
 
 # quit the connection (in postgre)
 \q
 
-# connect to the sprialdb.
-psql -d spiraldb --username=spiraluser
+# connect to the irasendb.
+psql -d irasendb --username=irasenuser
 
 # list the databases in the system. (in postgre)
 \list
@@ -32,6 +32,7 @@ psql -d spiraldb --username=spiraluser
 
 #list the table definition (in postgre)
 \d tablename
+
 
 #### Programming
 # make a component
