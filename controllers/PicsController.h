@@ -130,7 +130,7 @@ public:
     string folder = request.GetParam("f");
     DIR *d;
     struct dirent *dir;
-    d = opendir(("static/pics/" + folder).c_str());
+    d = opendir(("../www/static/pics/" + folder).c_str());
     vector<string> files;
     if(d){
       while ((dir = readdir(d)) != NULL){
@@ -157,7 +157,7 @@ public:
       return;
     }
 
-    string savPath = "static/pics/" + name;
+    string savPath = "../www/static/pics/" + name;
 
     unique_ptr<FILE, void(*)(FILE*)> outf(fopen(savPath.c_str(), "wb+"),
                                          [](FILE *p) {
@@ -174,7 +174,7 @@ public:
 
     auto date = getDate(savPath.c_str());
 
-    string savDir = "static/pics/test_" + *date;
+    string savDir = "../www/static/pics/test_" + *date;
     errno = 0;
     int re = mkdir(savDir.c_str(), 0755);
     if(re == 0 || errno == EEXIST){
