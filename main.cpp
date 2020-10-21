@@ -8,12 +8,15 @@
 #include "/usr/local/include/fcgio.h"
 
 #include "Request.h"
+#include "Session.h"
 #include "ControllerBase.h"
 #include "ControllerFactoryBase.h"
 
 using namespace std;
 
+map<string, Session*> ControllerBase::s_sessions;
 map<string, ControllerFactoryBase*> ControllerFactoryBase::s_ctrltbl;
+
 vector<void *> ControllerFactoryBase::s_libs;
 thread_local sigjmp_buf ControllerBase::s_jbuf;
 

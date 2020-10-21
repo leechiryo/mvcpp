@@ -30,7 +30,17 @@ class IndexController : public ControllerBase
         sprintf (str, "file read error. %s", strerror(errno));
       }
     }
-    pm->SetShowData("hellomsg", "hello " + request.GetParam("tbxName") + " " + fileName + "/" + str);
+
+    string name = request.GetParam("tbxName");
+    if(mySession != nullptr){
+      if(name != ""){
+        mySession->set("name", name);
+      } else if (name == "" && mySession->hasName("name")) {
+        name = mySession->get("name");
+      }
+    }
+
+    pm->SetShowData("hellomsg", "hello " + name + " " + fileName + "/" + str);
     Show(pm);
   }
 };

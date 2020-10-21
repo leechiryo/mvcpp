@@ -10,7 +10,10 @@
 #include <signal.h>
 #include <thread>
 #include <setjmp.h>
+#include <uuid.h>
+#include <functional>
 
+#include "Session.h"
 #include "Request.h"
 #include "ViewBase.h"
 #include "ModelBase.h"
@@ -24,6 +27,7 @@ class ControllerBase
     typedef unique_ptr<ModelBase> PtrModel;
     void InvokeResponse(const string &path, Request &request);
     string m_responseMime;
+    static map<string, Session*> s_sessions;
 
   protected:
     // pointer to response function
@@ -33,12 +37,14 @@ class ControllerBase
     PtrModel m_pmodel;
     bool m_debugMode;
     string m_ctrlName;
+    Session* mySession;
 
-    ControllerBase(const string& ctrlname, const char* responseMime="text/html")
+    ControllerBase(const string& ctrlname, const char* responseMime="text/html") 
     {
       m_debugMode = false;
       m_ctrlName = ctrlname;
       m_responseMime = responseMime;
+      mySession = nullptr;
     }
 
     void Show(ModelBase *pm)

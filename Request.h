@@ -9,6 +9,7 @@
 
 #include "RequestStream.h"
 #include "UploadFile.h"
+#include "Session.h"
 
 using namespace std;
 
@@ -227,7 +228,7 @@ public:
     scriptName, requestUri, documentUri, documentRoot,
     serverProtocol, gatewayInterface, serverSoftware,
     remoteAddr, remotePort, serverAddr, serverPort,
-    serverName, postContents;
+    serverName, postContents, httpCookie;
 
   Request(const FCGX_Request & request)
     : m_cout_fcgi_streambuf(request.out),
@@ -251,6 +252,10 @@ public:
     serverAddr = FCGX_GetParam("SERVER_ADDR", request.envp);
     serverPort = FCGX_GetParam("SERVER_PORT", request.envp);
     serverName = FCGX_GetParam("SERVER_NAME", request.envp);
+    httpCookie = "<NULL>";
+    if(FCGX_GetParam("HTTP_COOKIE", request.envp) != nullptr){
+      httpCookie = FCGX_GetParam("HTTP_COOKIE", request.envp);
+    }
 
     // analyse the query string (must be in the encoded status).
     m_params.clear();

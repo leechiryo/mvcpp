@@ -27,6 +27,7 @@ class DebugInfo : public ModelBase
       m_showData["SERVER_PORT"] = request.serverPort;
       m_showData["SERVER_NAME"] = request.serverName;
       m_showData["POST_CONTENTS"] = request.postContents;
+      m_showData["HTTP_COOKIE"] = request.httpCookie;
     }
 };
 
