@@ -22,31 +22,36 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
     // Try to get the session object from session id 
     if(s_sessions.find(idStr) != s_sessions.end()){
       mySession = s_sessions[idStr];
+      if(!mySession->isValid()){
+        // If the session is timeout, then delete it.
+        s_sessions.erase(idStr);
+	delete mySession;
+	mySession = nullptr;
+      }
     }
   }
   
   if(mySession == nullptr) {
 
-    // If the session does not found, create a new one.
-    //
-    // create a new session id first.
+    // If the session is not found, create a new one.
+   
+    // Create a new session id first.
     uuid_t uuid;
     uint32_t status;
     uuid_create(&uuid, &status);
-    char * id;
-    uuid_to_string(&uuid, &id, &status);
-    string idStr(id);
-    free(id);
-    id = nullptr;
+    char * idStr;
+    uuid_to_string(&uuid, &idStr, &status);
 
-    // set the new session id to cookie.
+    // Set the new session id to cookie.
     request.GetOutput() << "Set-Cookie: MVCPP_SESSION=" << idStr << "; SameSite=Lax\r\n";
 
-    // create a new Session object with the session id.
+    // Create a new Session object for the session id.
     Session* newSession = new Session();
     mySession = newSession;
-    s_sessions.insert(make_pair(idStr, newSession));
+    s_sessions[idStr] = newSession;
 
+    free(idStr);
+    idStr = nullptr;
   }
 
   request.GetOutput() << "\r\n";
@@ -65,8 +70,8 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
     }
     else
     {
-      // system error (SIGSEGV, SIGFPE etc.) occured in the response function.
-      // output the error message and return.
+      // System error (SIGSEGV, SIGFPE etc.) occured in the response function.
+      // Output the error message and return.
       request.GetOutput() << "System error occured. Errno: " << syserrno 
                           << " Path: " << path << endl;
     }
