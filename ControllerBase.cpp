@@ -1,13 +1,45 @@
+#include "Utility.h"
 #include "ControllerBase.h"
 #include "ControllerFactoryBase.h"
 
+void ControllerBase::OutputResponse(Request& request) {
+  ostream& httpOut = request.GetOutput();
+  // header
+  httpOut << "Status: ";
+  httpOut << m_status;
+  httpOut << "\r\n";
+  httpOut << "Content-type: ";
+  httpOut << m_responseMime;
+  httpOut << "\r\n";
+  if(m_status == 302) {
+    httpOut << "Location: ";
+    httpOut << m_location;
+    httpOut << "\r\n";
+  }
+  if(m_cookie != "") {
+    httpOut << "Set-Cookie: ";
+    httpOut << m_cookie;
+    httpOut << " Path=/; SameSite=Lax\r\n";
+  }
+  httpOut << "\r\n";
+
+  // body
+  if(m_status == 200 && m_pmodel) {
+    httpOut << *m_pmodel << endl;
+  }
+  else {
+    httpOut << m_error << endl;
+  }
+
+  if(m_debugMode)
+  {
+    DebugInfo m(request);
+    httpOut << m << endl;
+  }
+}
+
 void ControllerBase::InvokeResponse(const string &path, Request &request)
 {
-  // output the response header.
-  request.GetOutput() << "Content-type: ";
-  request.GetOutput() << m_responseMime;
-  request.GetOutput() << "\r\n";
-
   auto pos = request.httpCookie.find("MVCPP_SESSION=");
   if(pos != string::npos) {
     // Get the session id
@@ -43,7 +75,7 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
     uuid_to_string(&uuid, &idStr, &status);
 
     // Set the new session id to cookie.
-    request.GetOutput() << "Set-Cookie: MVCPP_SESSION=" << idStr << "; SameSite=Lax\r\n";
+    m_cookie = format("MVCPP_SESSION=%s;", idStr);
 
     // Create a new Session object for the session id.
     Session* newSession = new Session();
@@ -54,8 +86,16 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
     idStr = nullptr;
   }
 
-  request.GetOutput() << "\r\n";
+  // Check the session if the name is not exist, redirect to login page.
+  // The action 'login/do' will save the name to session.
+  if(!mySession->hasName("name") 
+     && (m_ctrlName != "login" || path != "act")){
+    m_status = 302;
+    m_location = "/login.html";
+    return;
+  }
 
+  // Process the request if it is a login user.
   auto posFunc = responseTbl.find(path);
   if(posFunc != responseTbl.end())
   {
@@ -66,25 +106,19 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
     if((syserrno = sigsetjmp(s_jbuf, 1)) == 0)
     {
       (this->*responseFunc)(request);
-      if(m_pmodel) request.GetOutput() << *m_pmodel << endl;
     }
     else
     {
       // System error (SIGSEGV, SIGFPE etc.) occured in the response function.
       // Output the error message and return.
-      request.GetOutput() << "System error occured. Errno: " << syserrno 
-                          << " Path: " << path << endl;
+      m_status = 500;
+      m_error = format("System error occured. Errno: %d Path: %s\r\n", syserrno, path.c_str());
     }
   }
   else
   {
-    request.GetOutput() << "Can't find the response for the path: " << path << endl;
-  }
-
-  if(m_debugMode)
-  {
-    DebugInfo m(request);
-    request.GetOutput() << m << endl;
+    m_status = 404;
+    m_error = format("Can't find the response for the path: %s\r\n", path.c_str());
   }
 }
 
@@ -94,4 +128,5 @@ void ControllerBase::InvokeResponse(Request &request,
 {
   unique_ptr<ControllerBase> pc(ControllerFactoryBase::s_ctrltbl[ctrlname]->CreateNew());
   pc->InvokeResponse(action, request);
+  pc->OutputResponse(request);
 }

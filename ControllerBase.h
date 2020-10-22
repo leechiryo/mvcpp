@@ -26,8 +26,14 @@ class ControllerBase
   private:
     typedef unique_ptr<ModelBase> PtrModel;
     void InvokeResponse(const string &path, Request &request);
+    void OutputResponse(Request& request);
     string m_responseMime;
     static map<string, Session*> s_sessions;
+
+    int m_status;
+    string m_cookie;
+    string m_location;
+    string m_error;
 
   protected:
     // pointer to response function
@@ -45,6 +51,7 @@ class ControllerBase
       m_ctrlName = ctrlname;
       m_responseMime = responseMime;
       mySession = nullptr;
+      m_status = 200;
     }
 
     void Show(ModelBase *pm)
@@ -55,6 +62,11 @@ class ControllerBase
     void SetDebugMode(bool mode)
     {
       m_debugMode = mode;
+    }
+
+    void RedirectTo(const string& path){
+      m_status = 302;
+      m_location = path;
     }
     
   public:

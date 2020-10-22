@@ -34,8 +34,9 @@ void ResponseRequest(PtrFCGXRequest request)
   else
   {
     // failed to load a library.
+    req.GetOutput() << "Status: 404\r\n";
     req.GetOutput() << "Content-type: text/html\r\n\r\n";
-    req.GetOutput() << "Can't initialize the controller: " << req.GetSoName() << endl;
+    req.GetOutput() << "Can't find the controller: " << req.GetSoName() << endl;
   }
 
   FCGX_Finish_r(request.get());
