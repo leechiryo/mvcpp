@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Excel file upload</title>
+</head>
+<body>
+  <h1>Excel File Upload</h1>
+  <hr>
+  <form action="upload" method="post" enctype="multipart/form-data">
+    <label>name:</label>
+    <input name="excelfile" type="file">
+    <input name="btnSubmit" type="submit" value="submit">
+  </form>
+  <div><% upresult %></div>
+</body>
+</html>
