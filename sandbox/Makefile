@@ -1,4 +1,4 @@
 all:
-	clang++ -std=c++11 test.cpp
-	./a.out
+	clang++ -pthread -std=c++11 test.cpp -o test
+	./test
 

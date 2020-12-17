@@ -10,6 +10,7 @@ class ManageControllerComplete :
   {
     responseTbl["list"] = static_cast<PtrResponseFunction>(&ManageController::list);
     responseTbl["listraw"] = static_cast<PtrResponseFunction>(&ManageController::listraw);
+    responseTbl["upload"] = static_cast<PtrResponseFunction>(&ManageController::upload);
   }
 };
 

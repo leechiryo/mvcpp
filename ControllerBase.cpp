@@ -87,7 +87,7 @@ void ControllerBase::InvokeResponse(const string &path, Request &request)
   }
 
   // Check the session if the name is not exist, redirect to login page.
-  // The action 'login/do' will save the name to session.
+  // The action 'login/act' will save the name to session.
   if(!mySession->hasName("name") 
      && (m_ctrlName != "login" || path != "act")){
     m_status = 302;
